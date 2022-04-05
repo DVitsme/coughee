@@ -5,16 +5,16 @@ import { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
 import ProductList from '../components/ProductList';
 
-export default function Home() {
-  const [products, setProducts] = useState([]);
-  useEffect(() => {
-    const getProducts = async () => {
-      return fetch('https://fakestoreapi.com/products?limit=10')
-        .then((res) => res.json())
-        .then((data) => setProducts(data));
-    };
-    getProducts();
-  }, []);
+export default function Home({ clothes }) {
+  const [products, setProducts] = useState(clothes);
+  // useEffect(() => {
+  //   const getProducts = async () => {
+  //     return fetch('https://fakestoreapi.com/products?limit=10')
+  //       .then((res) => res.json())
+  //       .then((data) => setProducts(data));
+  //   };
+  //   getProducts();
+  // }, []);
 
   const handleOnHeroButtonClick = () => {
     console.log('Sanity Check');
@@ -35,7 +35,6 @@ export default function Home() {
   );
 }
 
-/* This example requires Tailwind CSS v2.0+ */
 export function Quote() {
   return (
     <section className="py-12 marker:overflow-hidden md:py-20 lg:py-10">
@@ -74,4 +73,13 @@ export function Quote() {
       </div>
     </section>
   );
+}
+
+export async function getStaticProps(context) {
+  let res = await fetch('https://fakestoreapi.com/products?limit=10');
+  let clothes = await res.json();
+
+  return {
+    props: { clothes }
+  };
 }
