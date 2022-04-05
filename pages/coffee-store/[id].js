@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import Image from 'next/image';
+import Link from 'next/link';
+import Head from 'next/head';
 
-const Store = () => {
-  const router = useRouter();
-  const { query } = router;
-
-  console.log(router);
-
+const Store = ({ clothing }) => {
+  const [product, setProduct] = useState(clothing);
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
 
   return (
     <div className="md:flex items-start justify-center py-12 2xl:px-20 md:px-6 px-4">
+      <Head>
+        <title>{product.title}</title>
+      </Head>
       <div className="xl:w-2/6 lg:w-2/5 w-80 md:block hidden">
-        <img
-          className="w-full"
-          alt="img of a girl posing"
-          src="https://i.ibb.co/QMdWfzX/component-image-one.png"
+        <Image
+          src={product.image}
+          alt={product.title}
+          width="100%"
+          height="100%"
+          layout="responsive"
+          objectFit="contain"
         />
-        <img
-          className="mt-6 w-full"
-          alt="img of a girl posing"
-          src="https://i.ibb.co/qxkRXSq/component-image-two.png"
+        <Image
+          className="mt-6"
+          src={product.image}
+          alt={product.title}
+          width="100%"
+          height="100%"
+          layout="responsive"
+          objectFit="contain"
         />
       </div>
 
       <div className="xl:w-2/5 md:w-1/2 lg:ml-8 md:ml-6 md:mt-0 mt-6">
         <div className="border-b border-gray-200 pb-6">
           <p className="text-sm leading-none text-gray-600">
-            Balenciaga Fall Collection
+            <Link href="/">
+              <a>{product.category}</a>
+            </Link>
           </p>
           <h1
             className="
@@ -41,7 +51,7 @@ const Store = () => {
 							mt-2
 						"
           >
-            {query.title}
+            {product.title}
           </h1>
         </div>
         <div className="py-4 border-b border-gray-200 flex items-center justify-between">
@@ -154,14 +164,11 @@ const Store = () => {
               strokeLinejoin="round"
             />
           </svg>
-          Check availability in store
+          Price: {product.price}
         </button>
         <div>
           <p className="xl:pr-48 text-base lg:leading-tight leading-normal text-gray-600 mt-7">
-            It is a long established fact that a reader will be distracted by
-            thereadable content of a page when looking at its layout. The point
-            of usingLorem Ipsum is that it has a more-or-less normal
-            distribution of letters.
+            {product.description}
           </p>
           <p className="text-base leading-4 mt-7 text-gray-600">
             Product Code: 8BN321AF2IF0NYA
@@ -277,3 +284,24 @@ const Store = () => {
 };
 
 export default Store;
+
+export async function getStaticProps({ params }) {
+  const res = await fetch('https://fakestoreapi.com/products?limit=10');
+  const data = await res.json();
+  const clothing = data.find((product) => product.id.toString() === params.id);
+  return {
+    props: { clothing }
+  };
+}
+
+export async function getStaticPaths(props) {
+  const res = await fetch('https://fakestoreapi.com/products?limit=10');
+  const data = await res.json();
+  const paths = data.map((product) => {
+    return { params: { id: product.id.toString() } };
+  });
+  return {
+    paths,
+    fallback: false
+  };
+}

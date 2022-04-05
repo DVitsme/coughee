@@ -7,14 +7,8 @@ import ProductList from '../components/ProductList';
 
 export default function Home({ clothes }) {
   const [products, setProducts] = useState(clothes);
-  // useEffect(() => {
-  //   const getProducts = async () => {
-  //     return fetch('https://fakestoreapi.com/products?limit=10')
-  //       .then((res) => res.json())
-  //       .then((data) => setProducts(data));
-  //   };
-  //   getProducts();
-  // }, []);
+
+  console.log(products);
 
   const handleOnHeroButtonClick = () => {
     console.log('Sanity Check');
