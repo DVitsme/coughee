@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 
 import Hero from '../components/Hero';
 import ProductList from '../components/ProductList';
+import { fetchStores } from '../utils/fetchStores';
 
-export default function Home({ clothes }) {
+export default function Home({ clothes, foundStores }) {
   const [products, setProducts] = useState(clothes);
-
-  console.log(products);
+  const [stores, setStores] = useState(foundStores);
 
   const handleOnHeroButtonClick = () => {
     console.log('Sanity Check');
@@ -24,7 +24,7 @@ export default function Home({ clothes }) {
         handleOnClick={handleOnHeroButtonClick}
       />
       <Quote />
-      <ProductList products={products} />
+      <ProductList products={products} stores={stores} />
     </main>
   );
 }
@@ -73,7 +73,9 @@ export async function getStaticProps(context) {
   let res = await fetch('https://fakestoreapi.com/products?limit=10');
   let clothes = await res.json();
 
+  const foundStores = await fetchStores();
+
   return {
-    props: { clothes }
+    props: { clothes, foundStores }
   };
 }

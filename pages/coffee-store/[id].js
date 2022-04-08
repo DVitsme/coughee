@@ -2,42 +2,48 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Head from 'next/head';
+import { fetchStores, getImages } from '../../utils/fetchStores';
 
-const Store = ({ clothing }) => {
-  const [product, setProduct] = useState(clothing);
+const Store = ({ foundStore, photos }) => {
+  const [store, setStore] = useState(foundStore);
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
 
+  const firstImage = `${photos[0].prefix}original${photos[0].suffix}`;
+  const secondImage = `${photos[1].prefix}original${photos[1].suffix}`;
+  console.log(store);
   return (
     <div className="md:flex items-start justify-center py-12 2xl:px-20 md:px-6 px-4">
       <Head>
-        <title>{product.title}</title>
+        <title>{store.name}</title>
       </Head>
       <div className="xl:w-2/6 lg:w-2/5 w-80 md:block hidden">
         <Image
-          src={product.image}
-          alt={product.title}
+          src={firstImage}
+          alt={store.name}
           width="100%"
           height="100%"
           layout="responsive"
           objectFit="contain"
         />
-        <Image
-          className="mt-6"
-          src={product.image}
-          alt={product.title}
-          width="100%"
-          height="100%"
-          layout="responsive"
-          objectFit="contain"
-        />
+        {secondImage && (
+          <Image
+            className="mt-6"
+            src={secondImage}
+            alt={store.name}
+            width="100%"
+            height="100%"
+            layout="responsive"
+            objectFit="contain"
+          />
+        )}
       </div>
 
       <div className="xl:w-2/5 md:w-1/2 lg:ml-8 md:ml-6 md:mt-0 mt-6">
         <div className="border-b border-gray-200 pb-6">
           <p className="text-sm leading-none text-gray-600">
             <Link href="/">
-              <a>{product.category}</a>
+              <a>{store.categories[0].name}</a>
             </Link>
           </p>
           <h1
@@ -51,65 +57,16 @@ const Store = ({ clothing }) => {
 							mt-2
 						"
           >
-            {product.title}
+            {store.name}
           </h1>
         </div>
+
         <div className="py-4 border-b border-gray-200 flex items-center justify-between">
-          <p className="text-base leading-4 text-gray-800">Colours</p>
+          <p className="text-base leading-4 text-gray-800">Location</p>
           <div className="flex items-center justify-center">
-            <p className="text-sm leading-none text-gray-600">
-              Smoke Blue with red accents
+            <p className="text-sm leading-none text-gray-600 mr-3 mb-3">
+              {store.location.formatted_address}
             </p>
-            <div
-              className="
-								w-6
-								h-6
-								bg-gradient-to-b
-								from-gray-900
-								to-indigo-500
-								ml-3
-								mr-4
-								cursor-pointer
-							"
-            ></div>
-            <svg
-              className="cursor-pointer"
-              width="6"
-              height="10"
-              viewBox="0 0 6 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 1L5 5L1 9"
-                stroke="#4B5563"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="py-4 border-b border-gray-200 flex items-center justify-between">
-          <p className="text-base leading-4 text-gray-800">Size</p>
-          <div className="flex items-center justify-center">
-            <p className="text-sm leading-none text-gray-600 mr-3">38.2</p>
-            <svg
-              className="cursor-pointer"
-              width="6"
-              height="10"
-              viewBox="0 0 6 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 1L5 5L1 9"
-                stroke="#4B5563"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </div>
         </div>
         <button
@@ -164,27 +121,26 @@ const Store = ({ clothing }) => {
               strokeLinejoin="round"
             />
           </svg>
-          Price: {product.price}
+          {(store.distance / 1609.344).toString().slice(0, 4)} miles away
         </button>
         <div>
-          <p className="xl:pr-48 text-base lg:leading-tight leading-normal text-gray-600 mt-7">
-            {product.description}
-          </p>
-          <p className="text-base leading-4 mt-7 text-gray-600">
-            Product Code: 8BN321AF2IF0NYA
-          </p>
-          <p className="text-base leading-4 mt-4 text-gray-600">
-            Length: 13.2 inches
-          </p>
-          <p className="text-base leading-4 mt-4 text-gray-600">
-            Height: 10 inches
-          </p>
-          <p className="text-base leading-4 mt-4 text-gray-600">
-            Depth: 5.1 inches
-          </p>
-          <p className="md:w-96 text-base leading-normal text-gray-600 mt-4">
-            Composition: 100% calf leather, inside: 100% lamb leather
-          </p>
+          <p className="xl:pr-48 text-base lg:leading-tight leading-normal text-gray-600 mt-7"></p>
+          {store.categories.map((category) => (
+            <p
+              className="text-base leading-4 mt-7 text-gray-600 flex items-center"
+              key={category.id}
+            >
+              <Image
+                src={`${category.icon.prefix}32${category.icon.suffix}`}
+                alt={store.name}
+                width={32}
+                height={32}
+                className="bg-gray-800"
+              />
+
+              <span className="ml-2">{category.name}</span>
+            </p>
+          ))}
         </div>
         <div>
           <div className="border-t border-b py-4 mt-7 border-gray-200">
@@ -286,19 +242,21 @@ const Store = ({ clothing }) => {
 export default Store;
 
 export async function getStaticProps({ params }) {
-  const res = await fetch('https://fakestoreapi.com/products?limit=10');
-  const data = await res.json();
-  const clothing = data.find((product) => product.id.toString() === params.id);
+  const data = await fetchStores();
+  const foundStore = data.find(
+    (store) => store.fsq_id.toString() === params.id
+  );
+  const photos = await getImages(foundStore.fsq_id);
   return {
-    props: { clothing }
+    props: { foundStore, photos }
   };
 }
 
 export async function getStaticPaths(props) {
-  const res = await fetch('https://fakestoreapi.com/products?limit=10');
-  const data = await res.json();
-  const paths = data.map((product) => {
-    return { params: { id: product.id.toString() } };
+  const data = await fetchStores();
+
+  const paths = data.map((store) => {
+    return { params: { id: store.fsq_id.toString() } };
   });
   return {
     paths,
