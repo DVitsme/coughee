@@ -33,7 +33,8 @@ export default function ProductList({ products = [], stores = [] }) {
                     className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50"
                   />
                   <p className="relative text-lg font-semibold text-white">
-                    {store.distance / 1609.344}miles away
+                    {(store.distance / 1609.344).toString().slice(0, 4)} miles
+                    away
                   </p>
                 </div>
               </div>

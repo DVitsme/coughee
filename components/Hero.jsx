@@ -2,7 +2,7 @@ import Image from 'next/image';
 import React from 'react';
 import coffeeShop from '../public/static/images/coffee-shop.jpg';
 
-const Hero = ({ buttonText, handleOnClick }) => {
+const Hero = ({ buttonText, handleOnClick, isFindingLocation }) => {
   return (
     <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-20 sm:px-6 lg:mt-20">
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
@@ -33,7 +33,7 @@ const Hero = ({ buttonText, handleOnClick }) => {
                 className="mt-4 w-full px-6 py-3 grow border border-transparent text-base capitalize justify-center font-medium rounded-md text-white bg-indigo-800 shadow-sm hover:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:inline-flex sm:items-center sm:w-auto"
                 onClick={handleOnClick}
               >
-                {buttonText}
+                {isFindingLocation ? 'looading...' : buttonText}
               </button>
             </div>
             <p className="mt-4 text-sm text-gray-500">

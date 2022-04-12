@@ -2,13 +2,13 @@ const optionsGetHeaders = {
   method: 'GET',
   headers: {
     Accept: 'application/json',
-    Authorization: process.env.FOUR_SQUARE_API
+    Authorization: process.env.NEXT_PUBLIC_FOUR_SQUARE_API
   }
 };
 
-export const fetchStores = async () => {
+export const fetchStores = async (location) => {
   const response = await fetch(
-    'https://api.foursquare.com/v3/places/search?ll=39.088590%2C-76.939470&limit=15&categories=13000&open_now=true',
+    `https://api.foursquare.com/v3/places/search?ll=${location}&limit=15&categories=13000&open_now=true`,
     optionsGetHeaders
   );
   const stores = await response.json();

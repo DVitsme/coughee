@@ -4,14 +4,37 @@ import { useEffect, useState } from 'react';
 
 import Hero from '../components/Hero';
 import ProductList from '../components/ProductList';
+import useTractLocation from '../hooks/useTractLocation';
 import { fetchStores } from '../utils/fetchStores';
 
 export default function Home({ clothes, foundStores }) {
+  const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
+    useTractLocation();
+
+  const [location, setLocation] = useState('');
+
   const [products, setProducts] = useState(clothes);
   const [stores, setStores] = useState(foundStores);
 
+  useEffect(() => {
+    const getUsersStores = async () => {
+      if (location) {
+        try {
+          const fetchUserStores = await fetchStores(location);
+          console.log('Sanity Check');
+          console.log(fetchUserStores);
+        } catch (err) {
+          console.log('get location error', err);
+        }
+      }
+    };
+    return () => getUsersStores();
+  }, [location]);
+
   const handleOnHeroButtonClick = () => {
-    console.log('Sanity Check');
+    handleTrackLocation();
+
+    console.log({ location, locationErrorMsg });
   };
 
   return (
@@ -20,6 +43,7 @@ export default function Home({ clothes, foundStores }) {
         <title>Coughee Coffee</title>
       </Head>
       <Hero
+        isFindingLocation={isFindingLocation}
         buttonText="View stores nearby"
         handleOnClick={handleOnHeroButtonClick}
       />
@@ -73,7 +97,7 @@ export async function getStaticProps(context) {
   let res = await fetch('https://fakestoreapi.com/products?limit=10');
   let clothes = await res.json();
 
-  const foundStores = await fetchStores();
+  const foundStores = await fetchStores('35.689487%2C139.691711');
 
   return {
     props: { clothes, foundStores }
